@@ -1,0 +1,177 @@
+<!--============================================================================================================
+*VF Page Name   : Dashboard  
+*Description    : Dashboard updates the Bar chart series data to portal
+*Company        : Merfantz Technologies Pvt.ltd
+*Date           : 24.01.19
+*Changes Date   : 09.01.2023  Dashboard to update the line chart series and bar chart series to portal.
+*============================================================================================================-->
+<apex:page controller="dashBoardController" standardStylesheets="false" lightningStylesheets="true" showheader="false">
+    <center><b style="font-size:26px;background-color:white;">{!title}</b></center>
+    <!--{!$User.Id}-->
+    
+    <apex:variable value="{!if(left($User.Id,15) == '0058d0000054l9x','true','false')}" var="lines" />  
+    <apex:variable value="{!if(left($User.Id,15) != '0058d0000054l9x','true','false')}" var="bar_var" /> 
+    
+    <!--{!lines}
+{!bar_var}
+{!$User.Id}--> 
+ 
+    <apex:panelGrid columns="3" id="theGrid" bgcolor="white" >
+        <apex:panelGroup > 
+             <div style="text-align:center;font-size: 16px; font-weight: bold ; color : #00000"> 
+            <apex:outputText >Uncompleted Jobs where FA, FE, FA/EL, DR </apex:outputText>
+            </div> 
+            <apex:chart data="{!months}" height="300" width="420" >
+                <apex:legend position="bottom"/>
+                <apex:axis type="Numeric" position="left" title="Record Count" grid="true"  
+                           fields="count1,count2,count3,count4,count5" dashSize="2">
+                <apex:chartLabel />
+                </apex:axis>
+                <apex:axis type="Category" position="bottom" fields="yearMonth" title="Actual Visit Date">
+                <apex:chartLabel rotate="270"/>
+                </apex:axis>
+                <apex:barSeries rendered="{!bar_var}" orientation="vertical" axis="left" stacked="true" tips="true"  colorSet="#C42BE4,#59D834,#15EDF7,#E8703A,#2B73E4"
+                                yField="count2,count3,count4,count1,count5" xField="yearMonth" Title="FA, FA&EL, FE, EL, DR"/>
+                              
+                
+                <apex:lineSeries rendered="{!lines}" id="ls5" title="FA" axis="left" xField="yearMonth" yField="count2" 
+                                 fill="false" markerSize="4" markerType="circle"/>
+                <apex:lineSeries rendered="{!lines}" id="ls6" title="FA&EL" axis="left" xField="yearMonth" yField="count3"
+                                 fill="false" markerSize="4" markerType="circle"/>
+                <apex:lineSeries rendered="{!lines}" id="ls7" title="FE" axis="left" xField="yearMonth" yField="count4"
+                                 fill="false" markerSize="4" markerType="circle"/>
+                <apex:lineSeries rendered="{!lines}" id="ls8" title="EL" axis="left" xField="yearMonth" yField="count1"
+                                 fill="false" markerSize="4" markerType="circle"/>
+                <apex:lineSeries rendered="{!lines}" id="ls9" title="DR" axis="left" xField="yearMonth" yField="count5" 
+                                 fill="false" markerSize="4" markerType="circle"/>
+                                 
+            </apex:chart>  
+        </apex:panelGroup> 
+        
+        <apex:panelGroup >
+        <div style="text-align:center;font-size: 16px; font-weight: bold ; color : #00000">
+            <apex:outputText >Completed Jobs Having FA, FE, FA/EL, DR</apex:outputText>
+             </div>
+            <apex:chart data="{!monthscomplete}" height="300" width="420">
+                 <apex:legend position="bottom"/>
+                 <apex:axis type="Numeric" position="left" title="Record Count" grid="true"
+                           fields="count1,count2,count3,count4,count5" dashSize="2">
+                 <apex:chartLabel />
+                 </apex:axis>
+                 <apex:axis type="Category" position="bottom" fields="yearMonth" title="Actual Visit Date">
+                 <apex:chartLabel rotate="270"/>
+                 </apex:axis>
+                  <div style="font-size: -15px;">
+                 <apex:barSeries rendered="{!bar_var}" orientation="vertical" axis="left" stacked="true" tips="true" colorSet="#C42BE4,#59D834,#15EDF7,#E8703A,#2B73E4"
+                                yField="count2,count3,count4,count1,count5"  xField="yearMonth" 
+                                
+                     title="FA, FA&EL, FE, EL, DR " />
+                  </div>
+                 <apex:lineSeries rendered="{!lines}" id="ls0" title="FA" axis="left" xField="yearMonth" yField="count2" 
+                                 fill="false" markerSize="4" markerType="circle" />
+                 <apex:lineSeries rendered="{!lines}" id="ls1" title="FA/EL" axis="left" xField="yearMonth" yField="count3"
+                                 fill="false" markerSize="4" markerType="circle"/>
+                 <apex:lineSeries rendered="{!lines}" id="ls2" title="FE" axis="left" xField="yearMonth" yField="count4"
+                                 fill="false" markerSize="4" markerType="circle"/>
+                 <apex:lineSeries rendered="{!lines}" id="ls3" title="EL" axis="left" xField="yearMonth" yField="count1"
+                                 fill="false" markerSize="4" markerType="circle"/>
+                 <apex:lineSeries rendered="{!lines}" id="ls4" title="DR" axis="left" xField="yearMonth" yField="count5" 
+                                 fill="false" markerSize="4" markerType="circle"/>  
+                                              
+            </apex:chart>
+        </apex:panelGroup>   
+        
+        
+        <apex:panelGroup >   
+        <div style="text-align:center;font-size: 16px; font-weight: bold ; color : #00000">
+            <apex:outputText >Completed Call Out and Reactive Visits </apex:outputText> 
+             </div>  
+            <apex:chart data="{!ReactiveCallout}" height="300" width="420">
+                 <apex:legend position="bottom"/>
+                 <apex:axis type="Numeric" position="left" title="Record Count" grid="true"
+                           fields="count1,count2" dashSize="2">
+                 <apex:chartLabel />
+                 </apex:axis>
+                 <apex:axis type="Category" position="bottom" fields="yearMonth" title="Actual Visit Date">
+                 <apex:chartLabel rotate="270"/>
+                 </apex:axis>
+                 <apex:barSeries rendered="{!bar_var}" orientation="vertical" axis="left" stacked="true" colorSet="#2B73E4,#59D834,#E8703A"
+                                yField="count1,count2,count3" xField="yearMonth" title="Call Out, Revisit,Void"/>
+                
+                 <apex:lineSeries rendered="{!lines}" id="ls11" title="Call Out" axis="left" xField="yearMonth" yField="count1"
+                                 fill="false" markerSize="4" markerType="circle"/>
+                 <apex:lineSeries rendered="{!lines}"  id="ls12" title="Revisit" axis="left" xField="yearMonth" yField="count2"
+                                 fill="false" markerSize="4" markerType="circle"/>
+                 <apex:lineSeries rendered="{!lines}" id="ls13" title="Void" axis="left" xField="yearMonth" yField="count3"
+                                 fill="false" markerSize="4" markerType="circle"/>   
+            </apex:chart>
+         </apex:panelGroup>        
+        
+        <apex:panelGroup >
+        <div style="text-align:center;font-size: 16px; font-weight: bold ; color : #00000">
+            <apex:outputText >Service and Call Out Invoice per Month</apex:outputText>
+             </div>
+            <apex:chart height="300" width="400" data="{!ReactiveandCalloutinvoice}">
+                  <apex:legend position="bottom"/>
+                  <apex:axis type="Numeric" position="left" fields="count1,count2"
+                           title="Record Count" grid="true" dashSize="2" >
+                  <apex:chartLabel />
+                  </apex:axis>
+                  <apex:axis type="Category" position="bottom" fields="yearMonth" title="Original Actual Visit Date">
+                  <apex:chartLabel rotate="270"/>
+                  </apex:axis>
+                  <apex:barSeries rendered="{!bar_var}" orientation="vertical" axis="left" stacked="true" tips="true" colorSet="#2B73E4,#59D834"
+                                yField="count1,count2" xField="yearMonth"  title="Service,Call Out" highlight="" />
+                
+                  <apex:lineSeries rendered="{!lines}" id="ls41" title="Call Out" axis="left" xField="yearMonth" yField="count1"
+                                 fill="false" markerSize="4" markerType="circle"   />
+                  <apex:lineSeries rendered="{!lines}"  id="ls42" title="Service" axis="left" xField="yearMonth" yField="count2"
+                                 fill="false" markerSize="4" markerType="circle"  />     
+                
+            </apex:chart>
+         </apex:panelGroup>  
+         
+        <apex:panelGroup >
+        <div style="text-align:center;font-size: 16px; font-weight: bold ; color : #00000">
+             <apex:outputText >Installation Job Completed by Month</apex:outputText>
+              </div>
+             <apex:chart data="{!Installations}" height="300" width="420">
+                <apex:legend position="bottom"/>
+                <apex:axis type="Numeric" position="left" title="Record Count" grid="true"
+                           fields="count2,count1" dashSize="2">
+                <apex:chartLabel />
+                </apex:axis>
+                <apex:axis type="Category" position="bottom" fields="yearMonth" title="Actual Visit Date">
+                <apex:chartLabel rotate="270"/>
+                </apex:axis>
+                <apex:barSeries rendered="{!bar_var}" orientation="vertical" axis="left" stacked="True" tips="true" colorSet="#2B73E4,#59D834"
+                                yField="count1,count2" xField="yearMonth" title="True,False,"/> 
+                                
+                <apex:lineSeries rendered="{!lines}" title="True,False," axis="left" xField="yearMonth" yField="count1"
+                                 markerType="circle" markerSize="4" markerFill="#8E35EF"/>
+                <apex:lineSeries rendered="{!lines}" id="ls32" title="False" axis="left" xField="yearMonth" yField="count2"
+                                 fill="false" markerSize="4" markerType="circle"/>   
+             </apex:chart>
+         </apex:panelGroup>
+        
+        
+        
+    </apex:panelGrid>
+    
+   
+    <!--
+<div style="text-align:center;font-size: 16px; font-weight: bold ; color : #ff6666">
+<apex:outputText  rendered="">Job Call Out Hours </apex:outputText>
+</div>
+
+<br/>
+
+<apex:chart data="{!OrderData}" height="400" width="400"  >
+<apex:pieSeries dataField="data" ></apex:pieSeries>
+</apex:chart>
+
+-->
+   
+    
+    
+</apex:page>
