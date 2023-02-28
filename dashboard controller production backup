@@ -1,0 +1,851 @@
+/*============================================================================================================
+*Class Name     : dashBoardController 
+*Description    : dashboard updates the actual visit job for last 6 month
+*Company        : Merfantz Technologies Pvt.ltd
+*Date           : 24.01.19
+*Changes Date   : 12.12.22 Actual visit job for Next 12 month update dashboard
+                : 09.01.2023 Actual visit job for Jun 22 to Jun 23 data updates to dashboard
+                : 13.01.2023 Actual visit job for Oct 22 to Oct 23 data updates to dashboard
+*============================================================================================================*/
+public with sharing class dashBoardController{
+   
+    public Map<integer,map<string,integer>> monthMap{get;set;}
+    public Map<integer,map<String,integer>> monthMap1{get;set;}
+    public Map<integer,map<string,integer>> monthMap2{get;set;}
+    public Map<integer,map<string,integer>> monthMap3{get;set;}
+    public Map<integer,map<Boolean,integer>> monthMap4{get;set;}
+    //public Map<integer,map<Boolean,integer>> monthMap5{get;set;}    
+    public string title {get;set;}
+    //Map<integer,List<string>> monthMap1=new Map<integer,List<string>>();
+    
+    public string ym;
+    public string count;
+    public integer numym;
+    public integer nnnn;
+    public string UId;
+    public id recid ;
+    public id Rcid;    
+    
+    
+    // controller
+    Public dashBoardController(){
+        //  List<String> Label = Label.Magna_User_and_Account.split(',');
+        UId=[select Contactid from user where id=:UserInfo.getUserId()].contactid;
+        system.debug('UID'+UId);
+        
+        //   if(ApexPages.currentPage().getParameters().get('id') != null && ApexPages.currentPage().getParameters().get('id') != ''){
+        for(contact forid : [select account.name, accountid, name from contact where id=:UId]){
+            recid = forid.accountid ;//ApexPages.currentPage().getParameters().get('id');
+            
+            title=forid.account.name;
+            system.debug(recid );
+        }
+        
+        //          }
+        
+        //title=[select name from account where id=:recid].name;
+    }
+    //inner class
+    public class Month {
+        public Integer year {get; set;}
+        public String mstring {get; set;}
+        public Integer month {get; set;}
+        public Integer count {get; set;}
+        public Integer count1 {get; set;}
+        public Integer count2 {get; set;}
+        public Integer count3 {get; set;}
+        public Integer count4 {get; set;}
+        public Integer count5 {get; set;}
+        public String dsmothy {get; set;}
+        public String lyear {get; set;}
+        public String yearMonth {get; set; }
+        
+        // Inner Class Controller1        
+        
+        Month(Integer month, Integer count1,Integer count2,Integer count3,Integer count4,Integer count5,string smothy,string lastyears) { 
+            
+            this.month = month;
+            system.debug('This.month'+this.month);
+            this.count1 = count1;
+            system.debug('this.count1'+this.count1);
+            this.count2 = count2;
+            system.debug('this.count2'+this.count2);
+            this.count3 = count3;
+            system.debug('this.count3'+this.count3);
+            this.count4 = count4;
+            system.debug('this.count4'+this.count4);
+            this.count5 = count5;
+            system.debug('this.count5'+this.count5);
+            this.dsmothy=smothy; 
+            system.debug('this.dsmothy'+this.dsmothy);
+            this.lyear=lastyears; 
+            system.debug('this.lyear'+this.lyear);
+            this.yearMonth = lyear+ '/' + smothy; 
+            system.debug('this.yearMonth'+this.yearMonth);        
+        }
+        
+        // Inner Class Controller2       
+        Month(Integer month, Integer count1,Integer count2,string smothy,string lastyears) { 
+            
+            this.month = month;
+            system.debug('this.month'+this.month);
+            this.count1 = count1;
+            system.debug('this.count1 '+this.count1 );
+            this.count2 = count2; 
+            system.debug('this.count2'+this.count2);         
+            this.dsmothy=smothy; 
+            system.debug('this.dsmothy'+this.dsmothy);
+            this.lyear=lastyears; 
+            system.debug('this.lyear='+this.lyear);
+            this.yearMonth = lyear+ '/' + smothy; 
+            system.debug('this.yearMonth'+this.yearMonth);        
+        }
+        
+        //
+        Month(Integer month, Integer count1,Integer count2,Integer count3,string smothy,string lastyears) { 
+            
+            this.month = month;
+            system.debug(' this.month'+ this.month);
+            this.count1 = count1;
+            system.debug('this.count1'+this.count1);
+            this.count2 = count2; 
+            system.debug('this.count2'+this.count2);
+            this.count3=count3;   
+            system.debug(' this.count3'+ this.count3);      
+            this.dsmothy=smothy; 
+            system.debug('this.dsmothy'+this.dsmothy);
+            this.lyear=lastyears; 
+            system.debug('this.lyear'+this.lyear);
+            this.yearMonth = lyear+ '/' + smothy;  
+            system.debug('this.yearMonth'+this.yearMonth);       
+        }
+        
+        // Inner Class Controller3       
+        Month(Integer month, Integer count1,string smothy,string lastyears) { 
+            
+            this.month = month;
+            system.debug('this.yearMonth'+this.yearMonth);
+            this.count1 = count1;
+            system.debug('this.count1'+this.count1);
+            this.dsmothy=smothy; 
+            system.debug('this.dsmothy'+this.dsmothy);
+            this.lyear=lastyears; 
+            system.debug('this.lyear'+this.lyear);
+            this.yearMonth = lyear+ '/' + smothy;   
+            system.debug('this.yearMonth'+this.yearMonth);      
+        }
+        
+    }
+    
+    //uncomplete
+    public Month[] getMonths(){
+        Month[] months = new Month[] {};
+            monthMap2=new Map<integer,map<string,integer>>();
+        try{ 
+            if(ApexPages.currentPage().getParameters().get('id') != null && ApexPages.currentPage().getParameters().get('id') != ''){
+                recid = ApexPages.currentPage().getParameters().get('id');
+                system.debug('RECORDID'+recid );
+            }
+            
+            If(recid == system.label.Magna_User_and_Account||recid ==system.label.Phoenix){
+                system.debug('recid'+recid);
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Service_Term__r.Service_Type__c visittype,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:11 or fax__Actual_Visit_Date_Time__c=Last_MONTH or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=false and fax__Status__c!='Cancelled' and (Service_Type__c='Fire Extinguishers' or Service_Type__c='Fire Alarm' or Service_Type__c='Fire Alarm and Emergency Lighting' or Service_Type__c='Emergency Lighting' or Service_Type__c='Dry Riser')
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Service_Term__r.Service_Type__c
+                    order by  CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc, fax__Service_Term__r.Service_Type__c asc
+                ]) {
+                    system.debug(ar ); 
+                    
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap2.containsKey(numym)){
+                        monthMap2.put(numym,new map<string,integer>{'Emergency Lighting'=>0,'Fire Alarm'=>0,'Fire Alarm and Emergency Lighting'=>0,'Fire Extinguishers'=>0,'Dry Riser'=>0});
+                        monthMap2.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap2'+monthMap2);
+                    }else{
+                        monthMap2.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap2111'+monthMap2);
+                    } 
+                    system.debug('111111'+monthMap2);
+                }   
+            }
+            else If(recid ==system.label.Royal_Cornwall){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Service_Term__r.Service_Type__c visittype,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:3 or fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:9 or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=false and fax__Status__c!='Cancelled' and (Service_Type__c='Fire Extinguishers' or Service_Type__c='Fire Alarm' or Service_Type__c='Fire Alarm and Emergency Lighting' or Service_Type__c='Emergency Lighting' or Service_Type__c='Dry Riser')
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Service_Term__r.Service_Type__c
+                    order by  CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc, fax__Service_Term__r.Service_Type__c asc
+                ]) {
+                    system.debug(ar ); 
+                    
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap2.containsKey(numym)){
+                        monthMap2.put(numym,new map<string,integer>{'Emergency Lighting'=>0,'Fire Alarm'=>0,'Fire Alarm and Emergency Lighting'=>0,'Fire Extinguishers'=>0,'Dry Riser'=>0});
+                        monthMap2.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap2'+monthMap2);
+                    }else{
+                        monthMap2.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap2111'+monthMap2);
+                    } 
+                    system.debug('111111'+monthMap2);
+                }   
+            }
+            else{
+                
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Service_Term__r.Service_Type__c visittype,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:6 or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=false and fax__Status__c!='Cancelled' and (Service_Type__c='Fire Extinguishers' or Service_Type__c='Fire Alarm' or Service_Type__c='Fire Alarm and Emergency Lighting' or Service_Type__c='Emergency Lighting' or Service_Type__c='Dry Riser')
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Service_Term__r.Service_Type__c
+                    order by  CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc, fax__Service_Term__r.Service_Type__c asc
+                ]) {
+                    system.debug(ar );
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap2.containsKey(numym)){
+                        monthMap2.put(numym,new map<string,integer>{'Emergency Lighting'=>0,'Fire Alarm'=>0,'Fire Alarm and Emergency Lighting'=>0,'Fire Extinguishers'=>0,'Dry Riser'=>0});
+                        monthMap2.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap2'+monthMap2);
+                    }else{
+                        monthMap2.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap2111'+monthMap2);
+                    } 
+                    system.debug('111111'+monthMap2);
+                }   
+            }  
+            for(Integer str:monthMap2.keySet()){
+                List<integer> VarInt = new List<Integer>();
+                List<String> VarInt2 = new List<string>();
+                system.debug('monthMap2.keySet()'+monthMap2.keySet());
+                for(Integer Str1 : monthMap2.get(Str).values()){
+                system.debug('monthMap2.get(Str).values()'+ monthMap2.get(Str).values());
+                system.debug('Str1 '+Str1 );
+                
+                    string last=String.valueOf(str); 
+                    system.debug('last'+last); 
+                    string rlast=String.valueOf(str);
+                    system.debug('rlast'+rlast);
+                    String splitterstring=last.substring(4,last.length());
+                    system.debug(splitterstring);
+                    integer takemonth=Integer.valueOf(splitterstring);
+                    system.debug('takemonth'+takemonth);
+                    string strmonth1=monthFromInteger(takemonth);
+                    system.debug('strmonth1'+strmonth1);
+                    string removedstring= rlast.substring(0,4);     
+                    system.debug(removedstring);
+                    VarInt.add(str1);
+                    system.debug(VarInt);
+                    
+                    if(varInt2.size()<4){
+                        varInt2.add(string.valueof(str));
+                        varInt2.add(removedstring);
+                        varInt2.add(strmonth1);
+                        system.debug('varInt2'+varInt2);
+                    }
+                    
+                }
+                Months.add(new Month (integer.valueof(varInt2[0]),VarInt[0] ,VarInt[1] ,VarInt[2],VarInt[3],varInt[4],varInt2[1],varInt2[2]));
+                system.debug('varInt2[0]'+varInt2[0]);
+                system.debug('varInt[0]'+varInt[0]);
+                system.debug('varInt[1]'+varInt[1]);
+                system.debug('varInt[2]'+varInt[2]);
+                system.debug('varInt[3]'+varInt[3]);
+                system.debug('varInt[4]'+varInt[4]);
+                system.debug('varInt2[1]'+varInt2[1]);
+                system.debug('varInt2[2]'+varInt2[2]);
+                //system.debug('varInt2[0])'+varInt2[0]));
+                system.debug('Months'+Months);
+            } 
+        }catch(Exception e){
+            System.debug('Error'+e);
+        }
+        
+        System.debug('<<Months>>'+months); 
+        if(monthMap2.size()==0){
+            months.add(new Month(0,0,0,0,0,0,'0','0'));
+            system.debug('months'+months);
+        }
+        return months;
+    }
+    
+    //completed
+    
+    public Month[] getMonthscomplete(){
+        Month[] monthscomplete= new Month[] {};
+            monthMap=new Map<integer,map<string,integer>>();
+        
+        try{
+            if(ApexPages.currentPage().getParameters().get('id') != null && ApexPages.currentPage().getParameters().get('id') != ''){
+                recid = ApexPages.currentPage().getParameters().get('id');
+                system.debug(recid );
+            }
+            If(recid ==system.label.Magna_User_and_Account||recid ==system.label.Phoenix){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Service_Term__r.Service_Type__c visittype,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:11 or fax__Actual_Visit_Date_Time__c=Last_MONTH or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=true and (Service_Type__c='Fire Extinguishers' or Service_Type__c='Fire Alarm' or Service_Type__c='Fire Alarm and Emergency Lighting' or Service_Type__c='Emergency Lighting' or Service_Type__c='Dry Riser')
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Service_Term__r.Service_Type__c
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    
+                    system.debug(ar );
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    if(!monthMap.containsKey(numym)){
+                        monthMap.put(numym,new map<string,integer>{'Emergency Lighting'=>0,'Fire Alarm'=>0,'Fire Alarm and Emergency Lighting'=>0,'Fire Extinguishers'=>0,'Dry Riser'=>0});
+                        monthMap.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap'+monthMap);
+                    }else{
+                        monthMap.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap'+monthMap);
+                    } 
+                    system.debug('111111'+monthMap2);
+                }   
+            }
+            else If(recid ==system.label.Royal_Cornwall){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Service_Term__r.Service_Type__c visittype,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:3 or fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:9 or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=true and (Service_Type__c='Fire Extinguishers' or Service_Type__c='Fire Alarm' or Service_Type__c='Fire Alarm and Emergency Lighting' or Service_Type__c='Emergency Lighting' or Service_Type__c='Dry Riser')
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Service_Term__r.Service_Type__c
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    
+                    system.debug(ar );
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    if(!monthMap.containsKey(numym)){
+                        monthMap.put(numym,new map<string,integer>{'Emergency Lighting'=>0,'Fire Alarm'=>0,'Fire Alarm and Emergency Lighting'=>0,'Fire Extinguishers'=>0,'Dry Riser'=>0});
+                        monthMap.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap'+monthMap);
+                    }else{
+                        monthMap.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap'+monthMap);
+                    } 
+                    system.debug('111111'+monthMap2);
+                }   
+            }
+            
+            else{
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Service_Term__r.Service_Type__c visittype,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:6 OR fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=true and (Service_Type__c='Fire Extinguishers' or Service_Type__c='Fire Alarm' or Service_Type__c='Fire Alarm and Emergency Lighting' or Service_Type__c='Emergency Lighting' or Service_Type__c='Dry Riser')
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Service_Term__r.Service_Type__c
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    system.debug(ar );
+                    
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    if(!monthMap.containsKey(numym)){
+                        monthMap.put(numym,new map<string,integer>{'Emergency Lighting'=>0,'Fire Alarm'=>0,'Fire Alarm and Emergency Lighting'=>0,'Fire Extinguishers'=>0,'Dry Riser'=>0});
+                        monthMap.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap'+monthMap);
+                    }else{
+                        monthMap.get(numym).put((string) ar.get('visittype'),(integer) ar.get('c'));
+                        system.debug('monthMap'+monthMap);
+                    } 
+                    system.debug('111111'+monthMap2);
+                }   
+            }
+            for(Integer str:monthMap.keySet()){
+                List<integer> VarInt = new List<Integer>();
+                List<String> VarInt2 = new List<string>();
+                
+                for(Integer Str1 : monthMap.get(Str).values()){
+                    string last=String.valueOf(str); 
+                    system.debug('last'+last); 
+                    string rlast=String.valueOf(str);
+                    system.debug('rlast'+rlast);
+                    String splitterstring=last.substring(4,last.length());
+                    system.debug(splitterstring);
+                    integer takemonth=Integer.valueOf(splitterstring);
+                    system.debug('takemonth'+takemonth);
+                    string strmonth1=monthFromInteger(takemonth);
+                    system.debug('strmonth1'+strmonth1);
+                    string removedstring= rlast.substring(0,4);  
+                    system.debug('removedstring'+removedstring);
+                    system.debug(removedstring);
+                    VarInt.add(str1);
+                    system.debug('VarInt'+VarInt);
+                    
+                    if(varInt2.size()<4){
+                        varInt2.add(string.valueof(str));
+                        varInt2.add(removedstring);
+                        varInt2.add(strmonth1);
+                        system.debug('varInt2'+varInt2);
+                    }
+                    
+                }
+                monthscomplete.add(new Month (integer.valueof(varInt2[0]),VarInt[0] ,VarInt[1] ,VarInt[2],VarInt[3],VarInt[4],varInt2[1],varInt2[2]));
+                system.debug('monthscomplete'+monthscomplete);
+            } 
+        }catch(Exception e){
+            System.debug('Error'+e); 
+        } 
+        
+        System.debug('<<Months>>'+monthscomplete); 
+        
+        if(monthMap.size()==0){
+            monthscomplete.add(new Month(0,0,0,0,0,0,'0','0'));
+            system.debug('monthscomplete'+monthscomplete);
+        }
+        return monthscomplete;
+    }
+    
+    //Installations
+    public Month[] getInstallations(){
+        Month[] Installations= new Month[] {};
+            monthMap4=new Map<integer,map<Boolean,integer>>();
+        
+        try{
+            if(ApexPages.currentPage().getParameters().get('id') != null && ApexPages.currentPage().getParameters().get('id') != ''){
+                recid = ApexPages.currentPage().getParameters().get('id');
+                system.debug(recid );
+            }
+            If(recid == system.label.Magna_User_and_Account||recid ==system.label.Phoenix){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Visit_Complete__c VisitCompleted,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and  (fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:11 or fax__Actual_Visit_Date_Time__c=Last_MONTH or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and  fax__Visit_Type__c ='Installation'
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Visit_Complete__c
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    system.debug(ar );
+                    
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap4.containsKey(numym)){
+                        monthMap4.put(numym,new map<Boolean,integer>{True=>0,False=>0});
+                        monthMap4.get(numym).put((Boolean) ar.get('VisitCompleted'),(integer) ar.get('c'));
+                        system.debug('monthMap4'+monthMap4);
+                    }else{
+                        monthMap4.get(numym).put((Boolean) ar.get('VisitCompleted'),(integer) ar.get('c'));
+                        system.debug('monthMap4'+monthMap4);
+                    } 
+                    system.debug('111111'+monthMap4);
+                }
+            }
+            else If(recid ==system.label.Royal_Cornwall){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Visit_Complete__c VisitCompleted,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and  (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:3 or fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:9 or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and  fax__Visit_Type__c ='Installation'
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Visit_Complete__c
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    system.debug(ar );
+                    
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap4.containsKey(numym)){
+                        monthMap4.put(numym,new map<Boolean,integer>{True=>0,False=>0});
+                        monthMap4.get(numym).put((Boolean) ar.get('VisitCompleted'),(integer) ar.get('c'));
+                        system.debug('monthMap4'+monthMap4);
+                    }else{
+                        monthMap4.get(numym).put((Boolean) ar.get('VisitCompleted'),(integer) ar.get('c'));
+                        system.debug('monthMap4'+monthMap4);
+                    } 
+                    system.debug('111111'+monthMap4);
+                }
+            }
+            else{
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Visit_Complete__c VisitCompleted,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and  (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:6 OR fax__Actual_Visit_Date_Time__c=THIS_MONTH) and  fax__Visit_Type__c ='Installation'
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Visit_Complete__c
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    
+                    system.debug(ar );
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap4.containsKey(numym)){
+                        monthMap4.put(numym,new map<Boolean,integer>{True=>0,False=>0});
+                        monthMap4.get(numym).put((Boolean) ar.get('VisitCompleted'),(integer) ar.get('c'));
+                        system.debug('monthMap4'+monthMap4);
+                    }else{
+                        monthMap4.get(numym).put((Boolean) ar.get('VisitCompleted'),(integer) ar.get('c'));
+                        system.debug('monthMap4'+monthMap4);
+                    } 
+                    system.debug('111111'+monthMap4);
+                }  } 
+            
+            
+            for(Integer str:monthMap4.keySet()){
+                List<integer> VarInt = new List<Integer>();
+                List<String> VarInt2 = new List<string>();
+                
+                for(Integer Str1 : monthMap4.get(Str).values()){
+                    string last=String.valueOf(str);  
+                    system.debug('last'+last);
+                    string rlast=String.valueOf(str);
+                    system.debug('rlast'+rlast);
+                    String splitterstring=last.substring(4,last.length());
+                    system.debug(splitterstring);
+                    integer takemonth=Integer.valueOf(splitterstring);
+                    system.debug('takemonth'+takemonth);
+                    string strmonth1=monthFromInteger(takemonth);
+                    system.debug('strmonth1'+strmonth1);
+                    string removedstring= rlast.substring(0,4);     
+                    system.debug(removedstring);
+                    VarInt.add(str1);
+                    system.debug('VarInt'+VarInt);
+                    
+                    if(varInt2.size()<4){
+                        varInt2.add(string.valueof(str));
+                        varInt2.add(removedstring);
+                        varInt2.add(strmonth1);
+                        system.debug('varInt2'+varInt2);
+                    }
+                }
+                Installations.add(new Month (integer.valueof(varInt2[0]),VarInt[0],VarInt[1] ,varInt2[1],varInt2[2]));
+                system.debug('Installations'+Installations);
+            } 
+        }catch(Exception e){
+            System.debug('Error'+e);
+        }    
+        System.debug('<<Months>>'+Installations); 
+        
+        if(monthMap4.size()==0){
+            Installations.add(new Month(0,0,0,0,0,0,'0','0'));
+        }
+        return Installations;
+    }
+    
+    
+    //Reactive and Callout
+    public Month[] getReactiveCallout(){
+        Month[] ReactiveCallout = new Month[] {};
+            monthMap1=new Map<integer,map<string,integer>>();
+        try{ 
+            if(ApexPages.currentPage().getParameters().get('id') != null && ApexPages.currentPage().getParameters().get('id') != ''){
+                recid = ApexPages.currentPage().getParameters().get('id');
+                system.debug(recid );
+            }
+            if(recid ==system.label.Magna_User_and_Account||recid ==system.label.Phoenix){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, Call_Out_Type__c CallOutType,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and fax__Visit_Type__c='Call out' and (fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:11 or fax__Actual_Visit_Date_Time__c=Last_MONTH or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=true 
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), Call_Out_Type__c 
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    system.debug(ar);
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap1.containsKey(numym)){
+                        monthMap1.put(numym,new map<string,integer>{'Call Out'=>0,'Revisit'=>0,null=>0});
+                        monthMap1.get(numym).put((string) ar.get('CallOutType'),(integer) ar.get('c'));
+                    }else{
+                        monthMap1.get(numym).put((string) ar.get('CallOutType'),(integer) ar.get('c'));
+                    } 
+                    system.debug('111111'+monthMap1);
+                }
+            }
+            
+            else if(recid ==system.label.Royal_Cornwall){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, Call_Out_Type__c CallOutType,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and fax__Visit_Type__c='Call out' and (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:3 or fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:9 or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=true 
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), Call_Out_Type__c 
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    system.debug(ar);
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap1.containsKey(numym)){
+                        monthMap1.put(numym,new map<string,integer>{'Call Out'=>0,'Revisit'=>0,null=>0});
+                        monthMap1.get(numym).put((string) ar.get('CallOutType'),(integer) ar.get('c'));
+                    }else{
+                        monthMap1.get(numym).put((string) ar.get('CallOutType'),(integer) ar.get('c'));
+                    } 
+                    system.debug('111111'+monthMap1);
+                }
+            }
+            else{
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, Call_Out_Type__c CallOutType,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and fax__Visit_Type__c='Call out' and (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:6 OR fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=true 
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), Call_Out_Type__c 
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    system.debug(ar);
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    system.debug('ym'+ym);
+                    numym=Integer.valueOf(ym);
+                    system.debug('numym'+numym);
+                    
+                    if(!monthMap1.containsKey(numym)){
+                        monthMap1.put(numym,new map<string,integer>{'Call Out'=>0,'Revisit'=>0,null=>0});
+                        monthMap1.get(numym).put((string) ar.get('CallOutType'),(integer) ar.get('c'));
+                    }else{
+                        monthMap1.get(numym).put((string) ar.get('CallOutType'),(integer) ar.get('c'));
+                    } 
+                    system.debug('111111'+monthMap1);
+                }   
+            }
+            
+            for(Integer str:monthMap1.keySet()){
+                List<integer> VarInt = new List<Integer>();
+                List<String> VarInt2 = new List<string>();
+                
+                for(Integer Str1 : monthMap1.get(Str).values()){
+                    system.debug(str1);
+                    string last=String.valueOf(str);  
+                    string rlast=String.valueOf(str);
+                    String splitterstring=last.substring(4,last.length());
+                    system.debug(splitterstring);
+                    integer takemonth=Integer.valueOf(splitterstring);
+                    string strmonth1=monthFromInteger(takemonth);
+                    string removedstring= rlast.substring(0,4);     
+                    system.debug(removedstring);
+                    VarInt.add(str1);
+                    
+                    if(varInt2.size()<4){
+                        varInt2.add(string.valueof(str));
+                        varInt2.add(removedstring);
+                        varInt2.add(strmonth1);
+                        system.debug('varInt2'+varInt2);
+                    }
+                }
+                system.debug(VarInt);
+                ReactiveCallout.add(new Month (integer.valueof(varInt2[0]),VarInt[0] ,VarInt[1],VarInt[2] ,varInt2[1],varInt2[2]));           
+                system.debug(integer.valueof(varInt2[0])+' '+VarInt[0]+' '+VarInt[1]+' '+varInt2[1]+' '+varInt2[2]);
+            } 
+            system.debug(ReactiveCallout);
+            
+        }catch(Exception e){
+            System.debug('Error'+e);
+        }     
+        System.debug('<<Months>>'+ReactiveCallout); 
+        
+        if(monthMap1.size()==0){
+            ReactiveCallout.add(new Month(0,0,0,0,0,0,'0','0'));
+        }
+        return ReactiveCallout;
+    }
+    
+    // Reactive and Calloutinvoice 
+    
+    public Month[] getReactiveandCalloutinvoice(){
+        Month[] ReactiveCallout = new Month[] {};
+            monthMap3=new Map<integer,map<string,integer>>();
+        
+        try{
+            if(ApexPages.currentPage().getParameters().get('id') != null && ApexPages.currentPage().getParameters().get('id') != ''){
+                recid = ApexPages.currentPage().getParameters().get('id');
+                system.debug(recid );
+            } 
+            if(recid ==system.label.Magna_User_and_Account||recid ==system.label.Phoenix){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Visit_Type__c VisitType,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:11 or fax__Actual_Visit_Date_Time__c=Last_MONTH or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=true and (fax__Visit_Type__c ='Service' or fax__Visit_Type__c='Call Out') 
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Visit_Type__c 
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    system.debug(ar );
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    numym=Integer.valueOf(ym);
+                    
+                    if(!monthMap3.containsKey(numym)){
+                        monthMap3.put(numym,new map<string,integer>{'Service'=>0,'Call Out'=>0});
+                        monthMap3.get(numym).put((string) ar.get('VisitType'),(integer) ar.get('c'));
+                    }else{
+                        monthMap3.get(numym).put((string) ar.get('VisitType'),(integer) ar.get('c'));
+                    } 
+                    system.debug('111111'+monthMap3);
+                } 
+            }
+            
+            else if(recid ==system.label.Royal_Cornwall){
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Visit_Type__c VisitType,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=LAST_N_MONTHS:3 or fax__Actual_Visit_Date_Time__c=NEXT_N_MONTHS:9 or fax__Actual_Visit_Date_Time__c=THIS_MONTH) and fax__Visit_Complete__c=true and (fax__Visit_Type__c ='Service' or fax__Visit_Type__c='Call Out') 
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Visit_Type__c 
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    system.debug(ar );
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    numym=Integer.valueOf(ym);
+                    
+                    if(!monthMap3.containsKey(numym)){
+                        monthMap3.put(numym,new map<string,integer>{'Service'=>0,'Call Out'=>0});
+                        monthMap3.get(numym).put((string) ar.get('VisitType'),(integer) ar.get('c'));
+                    }else{
+                        monthMap3.get(numym).put((string) ar.get('VisitType'),(integer) ar.get('c'));
+                    } 
+                    system.debug('111111'+monthMap3);
+                } 
+            }
+            else{
+                
+                for (AggregateResult ar : [
+                    select                    
+                    CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c) y,CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) m, fax__Visit_Type__c VisitType,
+                    COUNT(Id) c
+                    from fax__Visit__c where fax__Site__c=:recid and (fax__Actual_Visit_Date_Time__c=THIS_MONTH OR fax__Actual_Visit_Date_Time__c=LAst_N_MONTHS:6) and fax__Visit_Complete__c=true and (fax__Visit_Type__c ='Service' or fax__Visit_Type__c='Call Out') 
+                    group by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c),CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c), fax__Visit_Type__c 
+                    order by CALENDAR_YEAR(fax__Actual_Visit_Date_Time__c)  asc, CALENDAR_MONTH(fax__Actual_Visit_Date_Time__c) asc
+                ]) {
+                    
+                    ym=String.valueOf((Integer) ar.get('y')+String.valueOf((Integer) ar.get('m')));
+                    numym=Integer.valueOf(ym);
+                    
+                    if(!monthMap3.containsKey(numym)){
+                        monthMap3.put(numym,new map<string,integer>{'Service'=>0,'Call Out'=>0});
+                        monthMap3.get(numym).put((string) ar.get('VisitType'),(integer) ar.get('c'));
+                    }else{
+                        monthMap3.get(numym).put((string) ar.get('VisitType'),(integer) ar.get('c'));
+                    } 
+                    system.debug('111111'+monthMap3);
+                }  
+            }
+            
+            for(Integer str: monthMap3.keySet()){
+                List<integer> VarInt = new List<Integer>();
+                List<String> VarInt2 = new List<string>();
+                
+                for(Integer Str1 : monthMap3.get(Str).values()){
+                    string last=String.valueOf(str);  
+                    string rlast=String.valueOf(str);
+                    String splitterstring=last.substring(4,last.length());
+                    system.debug(splitterstring);
+                    integer takemonth=Integer.valueOf(splitterstring);
+                    string strmonth1=monthFromInteger(takemonth);
+                    string removedstring= rlast.substring(0,4);     
+                    system.debug(removedstring);
+                    VarInt.add(str1);
+                    
+                    if(varInt2.size()<4){
+                        varInt2.add(string.valueof(str));
+                        varInt2.add(removedstring);
+                        varInt2.add(strmonth1);
+                    }
+                }
+                ReactiveCallout.add(new Month (integer.valueof(varInt2[0]),VarInt[0] ,VarInt[1] ,varInt2[1],varInt2[2]));
+            } 
+        }Catch(exception e){
+            system.debug('Error'+e);
+        }
+        System.debug('<<Months>>'+ReactiveCallout); 
+        
+        if(monthMap3.size()==0){
+            ReactiveCallout.add(new Month(0,0,0,0,0,0,'0','0'));
+        }
+        return ReactiveCallout;
+    }
+    
+    
+    public String monthFromInteger(Integer month){ 
+        String s; 
+        s = month == 1 ? 'Jan' : s; 
+        s = month == 2 ? 'Feb' : s; 
+        s = month == 3 ? 'Mar' : s; 
+        s = month == 4 ? 'Apr' : s; 
+        s = month == 5 ? 'May' : s; 
+        s = month == 6 ? 'Jun' : s; 
+        s = month == 7 ? 'Jul' : s; 
+        s = month == 8 ? 'Aug' : s; 
+        s = month == 9 ? 'Sep' : s; 
+        s = month == 10 ? 'Oct' : s; 
+        s = month == 11 ? 'Nov' : s; 
+        s = month == 12 ? 'Dec' : s;   
+        
+        return s; 
+        
+    }
+    
+    /*
+public class PiedashBoardController {
+
+public String name { get; set; }
+public Decimal data { get; set; }
+
+public PieData(String namevalue, Decimal datavalue) {
+name = namevalue;
+// data =2;
+data = datavalue;
+}
+
+}
+
+public List<PieData > getOrderData() {
+List<PieData > data = new List<PieData>();
+Decimal H4rs;
+Decimal H8rs;
+Decimal H24rs;
+H4rs= [select count() from fax__Visit__c where Hours__c= '4' and CreatedDate = THIS_YEAR];
+H8rs= [select count() from fax__Visit__c where Hours__c= '8'and CreatedDate = THIS_YEAR];
+H24rs = [select count() from fax__Visit__c where Hours__c= '24'and CreatedDate = THIS_YEAR];
+
+data.add(new PieData('4Hr',H4rs));
+data.add(new PieData('8Hrs',H8rs));
+data.add(new PieData('24Hrs',H24rs ));
+
+if(H4rs==0 || H8rs == 0 || H24rs == 0)
+{
+data.add(new PieData('4Hr',0));
+data.add(new PieData('8Hrs',0));
+data.add(new PieData('24Hrs',0)); 
+}
+return data;
+}
+*/
+    
+    
+}
